@@ -17,21 +17,24 @@ class GA:
         #create population of individuals with random noise
         self.population = []
         for _ in range(self.population_size):
-            noisy = baseline.copy().astype(np.int16)
-            noisy += np.random.randint(-15, 16, baseline.shape)
-            noisy = np.clip(noisy, 0, 255).astype(np.uint8)
+            noisy = baseline.copy().astype(np.float32)
+            noisy += np.random.randint(-5, 6, baseline.shape)
+            noisy = np.clip(noisy, 0, 255).astype(np.float32)
             self.population.append(Individual(self.compressed_shape, noisy))
 
     def evaluate_fitness(self):
         #evaluate fitness of each individual
         for individual in self.population:
-            upscaled = cv2.resize(individual.imgArray, 
-                                 (self.original_shape[1], self.original_shape[0]),
-                                 interpolation=cv2.INTER_CUBIC)
-            mse = np.mean((self.original_image - upscaled) ** 2)
-            individual.fitness = -mse  
+            individual.individual_fitness(self.original_image, self.original_shape)
 
-    def tournament_selection(self, tournament_size=3):
+            # upscaled = cv2.resize(individual.imgArray, 
+            #                      (self.original_shape[1], self.original_shape[0]),
+            #                      interpolation=cv2.INTER_CUBIC)
+            # mse = np.mean((self.original_image.astype(np.float32) - upscaled.astype(np.float32)) ** 2)
+            # individual.fitness = -mse  
+            
+
+    def tournament_selection(self, tournament_size=5):
         #select best individual from tournament
         tournament = np.random.choice(self.population, size=tournament_size, replace=False)
         return max(tournament, key=lambda x: x.fitness)
@@ -41,9 +44,9 @@ class GA:
         child1 = parent1.individualCopy()
         child2 = parent2.individualCopy()
         
-        mid = self.compressed_shape[0] // 2
-        child1.imgArray[mid:] = parent2.imgArray[mid:]
-        child2.imgArray[mid:] = parent1.imgArray[mid:]
+        cross_point = np.random.randint(1, (self.compressed_shape[0]-1))
+        child1.imgArray[cross_point:] = parent2.imgArray[cross_point:]
+        child2.imgArray[cross_point:] = parent1.imgArray[cross_point:]
         
         return child1, child2
 
@@ -51,7 +54,7 @@ class GA:
         #mutate individual by adding random noise
         mutated = individual.individualCopy()
         mask = np.random.random(mutated.imgArray.shape) < self.mutation_rate
-        noise = np.random.randint(-10, 11, mutated.imgArray.shape)
+        noise = np.random.randint(-1, 1, mutated.imgArray.shape)
         mutated.imgArray[mask] = np.clip(mutated.imgArray[mask] + noise[mask], 0, 255)
         return mutated
 
@@ -71,7 +74,7 @@ class GA:
             best = max(self.population, key=lambda x: x.fitness)
             print(f"Gen {gen}: Best MSE = {-best.fitness:.2f}")
 
-            new_population = []
+            new_population = [best.individualCopy()] #elitism. copies best individual to next population
             while len(new_population) < self.population_size:
                 parent1 = self.tournament_selection()
                 parent2 = self.tournament_selection()
@@ -83,6 +86,8 @@ class GA:
                 
                 child1 = self.mutate(child1)
                 child2 = self.mutate(child2)
+                child1.individual_fitness(self.original_image, self.original_shape)
+                child2.individual_fitness(self.original_image, self.original_shape)
                 
                 new_population.extend([child1, child2])
             
