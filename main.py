@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from GA import GA
-from Baseline import Baseline
 
 def mse(original_image, upscaled_image):
     mse = np.mean((original_image.astype(np.float32) - upscaled_image.astype(np.float32)) ** 2)
