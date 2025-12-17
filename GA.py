@@ -17,9 +17,9 @@ class GA:
         #create population of individuals with random noise
         self.population = []
         for _ in range(self.population_size):
-            noisy = baseline.copy().astype(np.float32)
-            noisy += np.random.randint(-5, 6, baseline.shape)
-            noisy = np.clip(noisy, 0, 255).astype(np.float32)
+            noisy = baseline.copy().astype(np.int16)
+            noisy += np.random.randint(-1, 2, baseline.shape)
+            noisy = np.clip(noisy, 0, 255).astype(np.uint8)
             self.population.append(Individual(self.compressed_shape, noisy))
 
     def evaluate_fitness(self):
@@ -43,18 +43,18 @@ class GA:
         #crossover two parents to create two children
         child1 = parent1.individualCopy()
         child2 = parent2.individualCopy()
-        
+
         cross_point = np.random.randint(1, (self.compressed_shape[0]-1))
         child1.imgArray[cross_point:] = parent2.imgArray[cross_point:]
         child2.imgArray[cross_point:] = parent1.imgArray[cross_point:]
         
         return child1, child2
-
+    
     def mutate(self, individual):
         #mutate individual by adding random noise
         mutated = individual.individualCopy()
         mask = np.random.random(mutated.imgArray.shape) < self.mutation_rate
-        noise = np.random.randint(-1, 1, mutated.imgArray.shape)
+        noise = np.random.randint(-2, 3, mutated.imgArray.shape)
         mutated.imgArray[mask] = np.clip(mutated.imgArray[mask] + noise[mask], 0, 255)
         return mutated
 
@@ -66,15 +66,22 @@ class GA:
                                 interpolation=cv2.INTER_CUBIC)
         
         self.initialize_population(baseline)
-        
+
         for gen in range(generations):
+
             #evaluate fitness of each individual
             self.evaluate_fitness()
-            
-            best = max(self.population, key=lambda x: x.fitness)
-            print(f"Gen {gen}: Best MSE = {-best.fitness:.2f}")
+            # Sort population by fitness descending
+            sorted_population = sorted(self.population, key=lambda x: x.fitness, reverse=True)
 
-            new_population = [best.individualCopy()] #elitism. copies best individual to next population
+            best1 = sorted_population[0].individualCopy() #elitism
+            best2 = sorted_population[1].individualCopy()
+            # best1.individual_fitness(self.original_image, self.original_shape)
+            # best2.individual_fitness(self.original_image, self.original_shape)
+
+            print(f"Gen {gen}: Best MSE = {-best1.fitness:.2f}")
+            new_population = [best1,best2] #elitism. copies best individual to next population
+
             while len(new_population) < self.population_size:
                 parent1 = self.tournament_selection()
                 parent2 = self.tournament_selection()
@@ -94,4 +101,6 @@ class GA:
             self.population = new_population[:self.population_size]
         
         self.evaluate_fitness()
-        return max(self.population, key=lambda x: x.fitness)
+        best_i = max(self.population, key=lambda x: x.fitness)
+        print("Best Individual MSE is", -best_i.fitness)
+        return best_i

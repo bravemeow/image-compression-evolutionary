@@ -12,7 +12,9 @@ class Individual:
         self.fitness = -np.inf
 
     def individualCopy(self):
-        return Individual(self.shape, self.imgArray.copy())
+        i =Individual(self.shape, self.imgArray.copy())
+        i.fitness=self.fitness
+        return i
 
     def individual_fitness(self, original_image, original_shape):
         upscaled = cv2.resize(self.imgArray.astype(np.uint8),
