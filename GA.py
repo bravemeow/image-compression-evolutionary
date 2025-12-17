@@ -60,6 +60,9 @@ class GA:
 
     def evolve(self, generations=500, baseline=None):
         #evolve population for generations
+        #store fitness history for convergence analysis
+        fitness_history = []
+        
         if baseline is None:
             baseline = cv2.resize(self.original_image, 
                                 (self.compressed_shape[1], self.compressed_shape[0]),
@@ -79,7 +82,10 @@ class GA:
             # best1.individual_fitness(self.original_image, self.original_shape)
             # best2.individual_fitness(self.original_image, self.original_shape)
 
-            print(f"Gen {gen}: Best MSE = {-best1.fitness:.2f}")
+            #save best fitness for convergence curve
+            best_mse = -best1.fitness
+            fitness_history.append(best_mse)
+            print(f"Gen {gen}: Best MSE = {best_mse:.2f}")
             new_population = [best1,best2] #elitism. copies best individual to next population
 
             while len(new_population) < self.population_size:
@@ -103,4 +109,4 @@ class GA:
         self.evaluate_fitness()
         best_i = max(self.population, key=lambda x: x.fitness)
         print("Best Individual MSE is", -best_i.fitness)
-        return best_i
+        return best_i, fitness_history
