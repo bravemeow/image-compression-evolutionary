@@ -4,7 +4,7 @@ from Individual import Individual
 
 class GA:
     def __init__(self, original_image, compressed_shape, 
-                 population_size=100, crossover_rate=0.8, mutation_rate=0.1):
+                 population_size=100, crossover_rate=0.8, mutation_rate=0.1, crossover='one_point'):
         self.original_image = original_image
         self.compressed_shape = compressed_shape
         self.original_shape = original_image.shape
@@ -12,6 +12,7 @@ class GA:
         self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
         self.population = []
+        self.crossover=crossover
 
     def initialize_population(self, baseline):
         #create population of individuals with random noise
@@ -39,7 +40,7 @@ class GA:
         tournament = np.random.choice(self.population, size=tournament_size, replace=False)
         return max(tournament, key=lambda x: x.fitness)
 
-    def crossover(self, parent1, parent2):
+    def one_point_crossover(self, parent1, parent2):
         #crossover two parents to create two children
         child1 = parent1.individualCopy()
         child2 = parent2.individualCopy()
@@ -49,6 +50,23 @@ class GA:
         child2.imgArray[cross_point:] = parent1.imgArray[cross_point:]
         
         return child1, child2
+    
+    def two_point_crossover(self, parent1, parent2):
+        child1 = parent1.individualCopy()
+        child2 = parent2.individualCopy()
+
+        while True: #to make sure cross_point1 and cross_point2 are not the same
+            cross_point1 =np.random.randint(1, (self.compressed_shape[0]-1)) #while loop will continue to run until both points are different
+            cross_point2 =np.random.randint(1, (self.compressed_shape[0]-1))
+            if cross_point1!=cross_point2:
+                break
+
+        cross_point1, cross_point2=sorted((cross_point1,cross_point2)) #so first point is smaller than second one
+        child1.imgArray[cross_point1:cross_point2] = parent2.imgArray[cross_point1:cross_point2]
+        child2.imgArray[cross_point1:cross_point2] = parent1.imgArray[cross_point1:cross_point2]
+        
+        return child1, child2
+
     
     def mutate(self, individual):
         #mutate individual by adding random noise
@@ -79,24 +97,28 @@ class GA:
 
             best1 = sorted_population[0].individualCopy() #elitism
             best2 = sorted_population[1].individualCopy()
-            # best1.individual_fitness(self.original_image, self.original_shape)
-            # best2.individual_fitness(self.original_image, self.original_shape)
-
+            
             #save best fitness for convergence curve
             best_mse = -best1.fitness
             fitness_history.append(best_mse)
             print(f"Gen {gen}: Best MSE = {best_mse:.2f}")
-            new_population = [best1,best2] #elitism. copies best individual to next population
+            new_population = [best1,best2] #elitism. copies best 2 individuals to next population
 
             while len(new_population) < self.population_size:
                 parent1 = self.tournament_selection()
                 parent2 = self.tournament_selection()
                 
-                if np.random.random() < self.crossover_rate:
-                    child1, child2 = self.crossover(parent1, parent2)
-                else:
-                    child1, child2 = parent1.individualCopy(), parent2.individualCopy()
-                
+                if self.crossover=='one_point':
+                    
+                    if np.random.random() < self.crossover_rate:
+                        child1, child2 = self.one_point_crossover(parent1, parent2)
+                    else:
+                        child1, child2 = parent1.individualCopy(), parent2.individualCopy()
+                else: #if not one point crossover, it will do two point crossover
+                    if np.random.random() < self.crossover_rate:
+                        child1, child2 = self.two_point_crossover(parent1, parent2)
+                    else:
+                        child1, child2 = parent1.individualCopy(), parent2.individualCopy()
                 child1 = self.mutate(child1)
                 child2 = self.mutate(child2)
                 child1.individual_fitness(self.original_image, self.original_shape)

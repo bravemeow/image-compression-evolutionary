@@ -3,6 +3,7 @@ import numpy as np
 from GA import GA
 import os
 import argparse
+import matplotlib.pyplot as plt
 
 def mse(original_image, upscaled_image):
     mse = np.mean((original_image.astype(np.float32) - upscaled_image.astype(np.float32)) ** 2)
@@ -37,59 +38,67 @@ def get_compression_settings(level='medium'):
     }
     return settings.get(level, settings['medium'])
 
-def process_image(image_path, compression_level='medium', output_prefix=None):
-    """
-    Process a single image with GA compression
-    Returns: best_individual, fitness_history
-    """
-    print(f"\nProcessing: {image_path}")
-    print(f"Compression level: {compression_level}")
+# def process_image(image_path, compression_level='medium', output_prefix=None):
+#     """
+#     Process a single image with GA compression
+#     Returns: best_individual, fitness_history
+#     """
+#     print(f"\nProcessing: {image_path}")
+#     print(f"Compression level: {compression_level}")
     
-    original = cv2.imread(image_path)
-    if original is None:
-        print(f"Error: Could not load image {image_path}")
-        return None, None
+#     original = cv2.imread(image_path)
+#     if original is None:
+#         print(f"Error: Could not load image {image_path}")
+#         return None, None
     
-    # Get settings based on compression level
-    settings = get_compression_settings(compression_level)
-    print(f"Settings: {settings}")
+#     # Get settings based on compression level
+#     settings = get_compression_settings(compression_level)
+#     print(f"Settings: {settings}")
     
-    # Generate baseline
-    baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC)
-    baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
-    baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic)
-    print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
+#     # Generate baseline
+#     baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC)
+#     baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+
+#     baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic)
+
+#     baseline_bilinear = cv2.resize(original, (200,120), cv2.INTER_LINEAR)
+#     baseline_upscaled_bilinear = cv2.resize(baseline_bilinear, (original.shape[1], original.shape[0]),interpolation=cv2.INTER_LINEAR)
     
-    # Create GA instance with settings
-    ga = GA(
-        original_image=original,
-        compressed_shape=(120,200,3),
-        population_size=settings['population_size'],
-        crossover_rate=settings['crossover_rate'],
-        mutation_rate=settings['mutation_rate']
-    )
+#     baseline_bilinear_mse = mse(original, baseline_upscaled_bilinear)
+
+#     print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
+#     print(f"Baseline Bilinear MSE = {baseline_bilinear_mse:.2f}")
     
-    # Evolve and get results with fitness history
-    best_individual, fitness_history = ga.evolve(
-        generations=settings['generations'], 
-        baseline=baseline_bicubic
-    )
+#     # Create GA instance with settings
+#     ga = GA(
+#         original_image=original,
+#         compressed_shape=(120,200,3),
+#         population_size=settings['population_size'],
+#         crossover_rate=settings['crossover_rate'],
+#         mutation_rate=settings['mutation_rate'],
+#         crossover='one-point' #write one-point if one point crossover. anything else will do two point crossover
+#     )
     
-    # Save compressed images
-    if output_prefix is None:
-        base_name = os.path.splitext(os.path.basename(image_path))[0]
-        output_prefix = f"{base_name}_{compression_level}"
+#     # Evolve and get results with fitness history
+#     best_individual, fitness_history = ga.evolve(
+#         generations=settings['generations'], 
+#         baseline=baseline_bicubic
+#     )
     
-    compressed = best_individual.imgArray
-    compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+#     # Save compressed images
+#     if output_prefix is None:
+#         base_name = os.path.splitext(os.path.basename(image_path))[0]
+#         output_prefix = f"{base_name}_{compression_level}"
     
-    cv2.imwrite(f"{output_prefix}_compressed.png", compressed)
-    cv2.imwrite(f"{output_prefix}_compressed_upscaled.png", compressed_up)
+#     compressed = best_individual.imgArray
+#     compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+#     cv2.imwrite(f"{output_prefix}_compressed.png", compressed)
+#     cv2.imwrite(f"{output_prefix}_compressed_upscaled.png", compressed_up)
     
-    final_mse = mse(original, compressed_up)
-    print(f"Final GA MSE = {final_mse:.2f}")
+#     final_mse = mse(original, compressed_up)
+#     print(f"Final GA MSE = {final_mse:.2f}")
     
-    return best_individual, fitness_history
+#     return best_individual, fitness_history
 
 def process_image_custom(image_path, settings, output_prefix=None):
     """
@@ -106,16 +115,33 @@ def process_image_custom(image_path, settings, output_prefix=None):
     # Generate baseline
     baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC)
     baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+
     baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic)
-    print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
+
+    baseline_bilinear = cv2.resize(original, (200,120), cv2.INTER_LINEAR)
+    baseline_upscaled_bilinear = cv2.resize(baseline_bilinear, (original.shape[1], original.shape[0]),interpolation=cv2.INTER_LINEAR)
     
+    baseline_bilinear_mse = mse(original, baseline_upscaled_bilinear)
+
+    print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
+    print(f"Baseline Bilinear MSE = {baseline_bilinear_mse:.2f}")
+
+    # Save compressed images
+    if output_prefix is None:
+        base_name = os.path.splitext(os.path.basename(image_path))[0]
+        output_prefix = base_name
+
+    cv2.imwrite(f"{output_prefix}_baseline_bicubic.png", baseline_bicubic)
+    cv2.imwrite(f"{output_prefix}_baseline_bilinear.png", baseline_bilinear)
+
     # Create GA instance with custom settings
     ga = GA(
         original_image=original,
         compressed_shape=(120,200,3),
         population_size=settings['population_size'],
         crossover_rate=settings['crossover_rate'],
-        mutation_rate=settings['mutation_rate']
+        mutation_rate=settings['mutation_rate'],
+        crossover='one_point' #can change this to anything else and it will perform 2 point crossover
     )
     
     # Evolve
@@ -124,10 +150,7 @@ def process_image_custom(image_path, settings, output_prefix=None):
         baseline=baseline_bicubic
     )
     
-    # Save compressed images
-    if output_prefix is None:
-        base_name = os.path.splitext(os.path.basename(image_path))[0]
-        output_prefix = base_name
+
     
     compressed = best_individual.imgArray
     compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
@@ -269,12 +292,22 @@ def main():
         )
         
         if best_individual is not None and fitness_history is not None:
+            print("\nConvergence Analysis:")
+            plt.figure()
+            plt.plot(fitness_history)
+            plt.xlabel("Generation")
+            plt.ylabel("Best MSE")
+            plt.title(f"Convergence Analysis for {base_name}")
+            plt.grid(True)
+            plt.savefig(f"convergence_analysis_{base_name}.png")
+            plt.show()
             print_convergence_summary(fitness_history, base_name, args.level)
             all_results.append({
                 'image': base_name,
                 'fitness_history': fitness_history,
                 'final_mse': fitness_history[-1] if fitness_history else None
             })
+            
     
     # Print summary
     print("\n=== Summary ===")
