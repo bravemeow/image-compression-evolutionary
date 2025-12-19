@@ -1,0 +1,131 @@
+test with 1 image (original.jpg), with one point crossover
+can write python main.py original.jpg in terminal to test
+
+output:
+=== GA Compression Settings ===
+Level: medium
+Generations: 100
+Population Size: 100
+Mutation Rate: 0.01
+Crossover Rate: 0.8
+==============================
+
+Processing: original.jpg
+Baseline Bicubic MSE = 267.06
+Baseline Bilinear MSE = 237.82
+Gen 0: Best MSE = 267.41
+Gen 1: Best MSE = 267.39
+Gen 2: Best MSE = 267.38
+Gen 3: Best MSE = 267.36
+Gen 4: Best MSE = 267.35
+Gen 5: Best MSE = 267.33
+Gen 6: Best MSE = 267.31
+Gen 7: Best MSE = 267.31
+Gen 8: Best MSE = 267.30
+Gen 9: Best MSE = 267.30
+Gen 10: Best MSE = 267.29
+Gen 11: Best MSE = 267.28
+Gen 12: Best MSE = 267.26
+Gen 13: Best MSE = 267.26
+Gen 14: Best MSE = 267.25
+Gen 15: Best MSE = 267.25
+Gen 16: Best MSE = 267.23
+Gen 17: Best MSE = 267.23
+Gen 18: Best MSE = 267.23
+Gen 19: Best MSE = 267.23
+Gen 20: Best MSE = 267.21
+Gen 21: Best MSE = 267.20
+Gen 22: Best MSE = 267.19
+Gen 23: Best MSE = 267.19
+Gen 24: Best MSE = 267.18
+Gen 25: Best MSE = 267.17
+Gen 26: Best MSE = 267.15
+Gen 27: Best MSE = 267.15
+Gen 28: Best MSE = 267.14
+Gen 29: Best MSE = 267.13
+Gen 30: Best MSE = 267.13
+Gen 31: Best MSE = 267.13
+Gen 32: Best MSE = 267.12
+Gen 33: Best MSE = 267.12
+Gen 34: Best MSE = 267.12
+Gen 35: Best MSE = 267.12
+Gen 36: Best MSE = 267.11
+Gen 37: Best MSE = 267.11
+Gen 38: Best MSE = 267.11
+Gen 39: Best MSE = 267.10
+Gen 40: Best MSE = 267.10
+Gen 41: Best MSE = 267.10
+Gen 42: Best MSE = 267.08
+Gen 43: Best MSE = 267.07
+Gen 44: Best MSE = 267.07
+Gen 45: Best MSE = 267.05
+Gen 46: Best MSE = 267.05
+Gen 47: Best MSE = 267.03
+Gen 48: Best MSE = 267.03
+Gen 49: Best MSE = 267.00
+Gen 50: Best MSE = 266.99
+Gen 51: Best MSE = 266.98
+Gen 52: Best MSE = 266.98
+Gen 53: Best MSE = 266.98
+Gen 54: Best MSE = 266.96
+Gen 55: Best MSE = 266.96
+Gen 56: Best MSE = 266.95
+Gen 57: Best MSE = 266.94
+Gen 58: Best MSE = 266.94
+Gen 59: Best MSE = 266.94
+Gen 60: Best MSE = 266.94
+Gen 61: Best MSE = 266.94
+Gen 62: Best MSE = 266.93
+Gen 63: Best MSE = 266.93
+Gen 64: Best MSE = 266.93
+Gen 65: Best MSE = 266.91
+Gen 66: Best MSE = 266.90
+Gen 67: Best MSE = 266.89
+Gen 68: Best MSE = 266.89
+Gen 69: Best MSE = 266.89
+Gen 70: Best MSE = 266.88
+Gen 71: Best MSE = 266.88
+Gen 72: Best MSE = 266.87
+Gen 73: Best MSE = 266.87
+Gen 74: Best MSE = 266.84
+Gen 75: Best MSE = 266.84
+Gen 76: Best MSE = 266.84
+Gen 77: Best MSE = 266.83
+Gen 78: Best MSE = 266.82
+Gen 79: Best MSE = 266.81
+Gen 80: Best MSE = 266.80
+Gen 81: Best MSE = 266.79
+Gen 82: Best MSE = 266.76
+Gen 83: Best MSE = 266.76
+Gen 84: Best MSE = 266.76
+Gen 85: Best MSE = 266.75
+Gen 86: Best MSE = 266.75
+Gen 87: Best MSE = 266.75
+Gen 88: Best MSE = 266.75
+Gen 89: Best MSE = 266.74
+Gen 90: Best MSE = 266.74
+Gen 91: Best MSE = 266.74
+Gen 92: Best MSE = 266.73
+Gen 93: Best MSE = 266.73
+Gen 94: Best MSE = 266.73
+Gen 95: Best MSE = 266.73
+Gen 96: Best MSE = 266.72
+Gen 97: Best MSE = 266.72
+Gen 98: Best MSE = 266.71
+Gen 99: Best MSE = 266.69
+Best Individual MSE is 266.6943
+Final GA MSE = 266.69
+
+Convergence Analysis:
+
+=== Convergence Summary ===
+Image: original
+Level: medium
+Initial MSE: 267.41
+Final MSE: 266.69
+Improvement: 0.71 (0.3%)
+Best Generation: 99
+==============================
+
+=== Summary ===
+original: Final MSE = 266.69
