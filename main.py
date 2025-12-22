@@ -38,68 +38,6 @@ def get_compression_settings(level='medium'):
     }
     return settings.get(level, settings['medium'])
 
-# def process_image(image_path, compression_level='medium', output_prefix=None):
-#     """
-#     Process a single image with GA compression
-#     Returns: best_individual, fitness_history
-#     """
-#     print(f"\nProcessing: {image_path}")
-#     print(f"Compression level: {compression_level}")
-    
-#     original = cv2.imread(image_path)
-#     if original is None:
-#         print(f"Error: Could not load image {image_path}")
-#         return None, None
-    
-#     # Get settings based on compression level
-#     settings = get_compression_settings(compression_level)
-#     print(f"Settings: {settings}")
-    
-#     # Generate baseline
-#     baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC)
-#     baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
-
-#     baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic)
-
-#     baseline_bilinear = cv2.resize(original, (200,120), cv2.INTER_LINEAR)
-#     baseline_upscaled_bilinear = cv2.resize(baseline_bilinear, (original.shape[1], original.shape[0]),interpolation=cv2.INTER_LINEAR)
-    
-#     baseline_bilinear_mse = mse(original, baseline_upscaled_bilinear)
-
-#     print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
-#     print(f"Baseline Bilinear MSE = {baseline_bilinear_mse:.2f}")
-    
-#     # Create GA instance with settings
-#     ga = GA(
-#         original_image=original,
-#         compressed_shape=(120,200,3),
-#         population_size=settings['population_size'],
-#         crossover_rate=settings['crossover_rate'],
-#         mutation_rate=settings['mutation_rate'],
-#         crossover='one-point' #write one-point if one point crossover. anything else will do two point crossover
-#     )
-    
-#     # Evolve and get results with fitness history
-#     best_individual, fitness_history = ga.evolve(
-#         generations=settings['generations'], 
-#         baseline=baseline_bicubic
-#     )
-    
-#     # Save compressed images
-#     if output_prefix is None:
-#         base_name = os.path.splitext(os.path.basename(image_path))[0]
-#         output_prefix = f"{base_name}_{compression_level}"
-    
-#     compressed = best_individual.imgArray
-#     compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
-#     cv2.imwrite(f"{output_prefix}_compressed.png", compressed)
-#     cv2.imwrite(f"{output_prefix}_compressed_upscaled.png", compressed_up)
-    
-#     final_mse = mse(original, compressed_up)
-#     print(f"Final GA MSE = {final_mse:.2f}")
-    
-#     return best_individual, fitness_history
-
 def process_image_custom(image_path, settings, output_prefix=None):
     """
     Process image with custom settings dictionary
@@ -141,7 +79,7 @@ def process_image_custom(image_path, settings, output_prefix=None):
         population_size=settings['population_size'],
         crossover_rate=settings['crossover_rate'],
         mutation_rate=settings['mutation_rate'],
-        crossover='one_point' #can change this to anything else and it will perform 2 point crossover
+        crossover='one_point' # write 'one_point' for one point crossover. can change this to anything else and it will perform 2 point crossover
     )
     
     # Evolve
@@ -154,7 +92,7 @@ def process_image_custom(image_path, settings, output_prefix=None):
     
     compressed = best_individual.imgArray
     compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
-    
+
     cv2.imwrite(f"{output_prefix}_compressed.png", compressed)
     cv2.imwrite(f"{output_prefix}_compressed_upscaled.png", compressed_up)
     
