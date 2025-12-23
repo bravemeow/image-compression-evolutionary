@@ -28,13 +28,6 @@ class GA:
         for individual in self.population:
             individual.individual_fitness(self.original_image, self.original_shape)
 
-            # upscaled = cv2.resize(individual.imgArray, 
-            #                      (self.original_shape[1], self.original_shape[0]),
-            #                      interpolation=cv2.INTER_CUBIC)
-            # mse = np.mean((self.original_image.astype(np.float32) - upscaled.astype(np.float32)) ** 2)
-            # individual.fitness = -mse  
-            
-
     def tournament_selection(self, tournament_size=5):
         #select best individual from tournament
         tournament = np.random.choice(self.population, size=tournament_size, replace=False)
@@ -92,7 +85,7 @@ class GA:
 
             #evaluate fitness of each individual
             self.evaluate_fitness()
-            # Sort population by fitness descending
+            # Sort population by fitness best to worst
             sorted_population = sorted(self.population, key=lambda x: x.fitness, reverse=True)
 
             best1 = sorted_population[0].individualCopy() #elitism

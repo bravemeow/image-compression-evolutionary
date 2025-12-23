@@ -5,7 +5,7 @@ import os
 import argparse
 import matplotlib.pyplot as plt
 
-def mse(original_image, upscaled_image):
+def mse(original_image, upscaled_image): #computes the mean squared error between original image and upscaled image
     mse = np.mean((original_image.astype(np.float32) - upscaled_image.astype(np.float32)) ** 2)
     return mse
 
@@ -45,23 +45,23 @@ def process_image_custom(image_path, settings, output_prefix=None):
     """
     print(f"\nProcessing: {image_path}")
     
-    original = cv2.imread(image_path)
+    original = cv2.imread(image_path) #get original image
     if original is None:
         print(f"Error: Could not load image {image_path}")
         return None, None
     
     # Generate baseline
-    baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC)
-    baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+    baseline_bicubic = cv2.resize(original, (200,120), cv2.INTER_CUBIC) #compresses image
+    baseline_upscaled_bicubic = cv2.resize(baseline_bicubic, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC) #upscale it
 
-    baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic)
+    baseline_bicubic_mse = mse(original, baseline_upscaled_bicubic) #computes the mse using original image and upscaled image
 
     baseline_bilinear = cv2.resize(original, (200,120), cv2.INTER_LINEAR)
     baseline_upscaled_bilinear = cv2.resize(baseline_bilinear, (original.shape[1], original.shape[0]),interpolation=cv2.INTER_LINEAR)
     
     baseline_bilinear_mse = mse(original, baseline_upscaled_bilinear)
 
-    print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}")
+    print(f"Baseline Bicubic MSE = {baseline_bicubic_mse:.2f}") #print mse so it can be used to see if solution beats baseline
     print(f"Baseline Bilinear MSE = {baseline_bilinear_mse:.2f}")
 
     # Save compressed images
@@ -90,13 +90,13 @@ def process_image_custom(image_path, settings, output_prefix=None):
     
 
     
-    compressed = best_individual.imgArray
-    compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC)
+    compressed = best_individual.imgArray #store best individual image
+    compressed_up = cv2.resize(compressed, (original.shape[1], original.shape[0]), interpolation=cv2.INTER_CUBIC) #upsacle it
 
     cv2.imwrite(f"{output_prefix}_compressed.png", compressed)
     cv2.imwrite(f"{output_prefix}_compressed_upscaled.png", compressed_up)
     
-    final_mse = mse(original, compressed_up)
+    final_mse = mse(original, compressed_up) #compute mse using original and upscaled version of best individual
     print(f"Final GA MSE = {final_mse:.2f}")
     
     return best_individual, fitness_history
@@ -230,7 +230,7 @@ def main():
         )
         
         if best_individual is not None and fitness_history is not None:
-            print("\nConvergence Analysis:")
+            print("\nConvergence Analysis:") #makes convergence graph using fitness history
             plt.figure()
             plt.plot(fitness_history)
             plt.xlabel("Generation")
